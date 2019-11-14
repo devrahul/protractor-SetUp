@@ -34,7 +34,7 @@ describe('cribs.test App', () => {
   it('should be able to login', function () {
     browser.wait( () => {
       page.userIdInputElm.clear();
-      page.userIdInputElm.sendKeys('dhruv.arora@hays.com');
+      page.userIdInputElm.sendKeys('rahul.arora@tcs.com');
       page.passwordInputElm.clear();
       page.passwordInputElm.sendKeys('WSPpass123');  
     // expect(page.userIdInputElm).toBeTruthy();
