@@ -19,7 +19,7 @@ describe('cribs.test App', () => {
     browser.controlFlow().execute(function () {
       browser.ignoreSynchronization = true;
     });
-    browser.driver.get('https://haysonlinedev.b2clogin.com/haysonlinedev.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_WSP_SignIn&client_id=2a76f224-fe13-410a-9f90-3df3a8aacf14&nonce=defaultNonce&redirect_uri=https%3A%2F%2Fworkspacetest.hays.co.uk&scope=openid&response_type=id_token')
+    browser.driver.get('third party url to redirect')
 
   });
 
