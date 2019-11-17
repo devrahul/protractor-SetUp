@@ -2,7 +2,9 @@
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
 const { SpecReporter } = require('jasmine-spec-reporter');
-var jasmineReporters = require('jasmine-reporters');
+const jasmineReporters = require('jasmine-reporters');
+const HTMLReport = require('protractor-html-reporter-2');
+const fs = require('fs-extra');
 
 exports.config = {
   allScriptsTimeout: 11000,
@@ -18,60 +20,67 @@ exports.config = {
   jasmineNodeOpts: {
     showColors: true,
     defaultTimeoutInterval: 30000,
-    print: function () { }
+    print: function() {}
   },
-  beforeLaunch: function () {
+  onPrepare() {
     require('ts-node').register({
       project: 'e2e/tsconfig.e2e.json'
     });
-  },
-  onPrepare() {
-    var fs = require('fs-extra');
-    fs.emptyDir('screenshots/', function (err) {
-      console.log(err);
+
+    fs.emptyDir('e2e/_report', (err) => { err && console.log(err); });
+
+    const jasmineEnv = jasmine.getEnv();
+
+    const specReporter = new SpecReporter({ spec: { displayStacktrace: true } });
+
+    const xmlReporter = new jasmineReporters.JUnitXmlReporter({
+      consolidateAll: true,
+      savePath: './e2e/_report',
+      filePrefix: 'e2exmlresults'
     });
 
-    // jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
-    jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
-      consolidateAll: true,
-      savePath: './',
-      filePrefix: 'xmlresults',
-      specDone: function(result) {
-        if (result.status == 'failed') {
-            browser.getCapabilities().then(function (caps) {
-                var browserName = caps.get('browserName');
+    const screenshotReporter = {
+      specDone: function (result) {
+        if (result.status === 'failed') {
+          browser.getCapabilities().then(function (caps) {
+            const browserName = caps.get('browserName');
 
-                browser.takeScreenshot().then(function (png) {
-                    var stream = fs.createWriteStream('screenshots/' + browserName + '-' + result.fullName+ '.png');
-                    stream.write(new Buffer(png, 'base64'));
-                    stream.end();
-                });
+            browser.takeScreenshot().then(function (png) {
+              const stream = fs.createWriteStream('e2e/_report/screenshot/' + browserName + '-' + result.fullName + '.png');
+              stream.write(new Buffer(png, 'base64'));
+              stream.end();
             });
+          });
         }
-    }
-    }));
+      }
+    };
+
+    jasmineEnv.addReporter(specReporter);
+    jasmineEnv.addReporter(xmlReporter);
+    jasmineEnv.addReporter(screenshotReporter);
   },
-  onComplete: function () {
-    var browserName, browserVersion;
-    var capsPromise = browser.getCapabilities();
+  //HTMLReport called once tests are finished
+  onComplete: function() {
+    let browserName, browserVersion, platform;
+    const capsPromise = browser.getCapabilities();
 
     capsPromise.then(function (caps) {
       browserName = caps.get('browserName');
       browserVersion = caps.get('version');
       platform = caps.get('platform');
-      var HTMLReport = require('protractor-html-reporter-2');
-      testConfig = {
-        reportTitle: 'Protractor Test Execution Report',
-        outputPath: './',
+
+      const testConfig = {
+        reportTitle: 'Protractor Test Report',
+        outputPath: './e2e/_report',
         outputFilename: 'ProtractorTestReport',
-        screenshotPath: './screenshots',
+        screenshotPath: '.',
         testBrowser: browserName,
         browserVersion: browserVersion,
         modifiedSuiteName: false,
         screenshotsOnlyOnFailure: true,
         testPlatform: platform
       };
-      new HTMLReport().from('xmlresults.xml', testConfig);
+      new HTMLReport().from('e2e/_report/e2exmlresults.xml', testConfig);
     });
   }
 };
