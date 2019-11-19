@@ -48,10 +48,8 @@ export class TestPage {
       // wait for all the links to be grabbed
       browser.waitForAngular().then( async function () {
         await urls.forEach(function (url) {
-          if( url != 'users') {
             //browser.switchTo().alert().accept();
             browser.get(url);
-          } 
           // checkBrowserState();
         });
       });

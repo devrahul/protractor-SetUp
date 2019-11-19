@@ -1,12 +1,12 @@
 import { TestPage } from './app.po';
-import { LoginPage } from "./login.po";
+import { LoginPage } from './login.po';
 import { browser, element, by, protractor } from 'protractor';
 import { DashboardPage } from './dashboard.po';
 
-describe('cribs.test App', () => {
+describe('User Login with Case when : ', () => {
   let page: TestPage;
   let login: LoginPage;
-  let dashboard: DashboardPage;
+  let dashboard : DashboardPage;
   const EC = protractor.ExpectedConditions;
 
   beforeEach(() => {
@@ -15,13 +15,13 @@ describe('cribs.test App', () => {
     dashboard = new DashboardPage();
   });
 
-  it('should display message saying app works', () => {
+  /*it(' display message saying app works', () => {
     page.navigateTo();
     expect(page.getParagraphText()).toBeTruthy();
-  });
+  });*/
 
-  it('should Navigate to Mircosoft Azure for Client Login Request ', () => {
-    //    page.navigateTo();
+  it(' Navigate to Mircosoft Azure for Client Login Request ', () => {
+//    page.navigateTo();
     browser.controlFlow().execute(function () {
       browser.ignoreSynchronization = true;
     });
@@ -30,7 +30,7 @@ describe('cribs.test App', () => {
 
   });
 
-  it('should have Mircosoft Azure for Client Login Page ', () => {
+  it(' have Mircosoft Azure for Client Login Page ', () => {
     browser.controlFlow().execute(function () {
       browser.ignoreSynchronization = true;
     });
@@ -38,17 +38,50 @@ describe('cribs.test App', () => {
     browser.sleep(3000);
   });
 
-  it('should display an error message to the user if they provided incorrect credentials', () => {
-    browser.waitForAngularEnabled(false);
-    login.trySignIn('123', '123');
+  it(' display an error message to the user when no username and password given', async () => {
+    
+    await login.trySignIn('', '');
     browser.wait(EC.visibilityOf(login.errorMessage));
-    return login.errorMessage.getText().then(txt => {
-      expect(txt).toBe("Please enter a valid email address");
+    await login.errorMessage.getText().then(txt => {
+      expect(txt).toBe('Please enter your email');
+    });
+  });
+
+  /* it(' display an error message to user when invalid username given',  () => {    
+    login.trySignIn('test@', '');
+    browser.wait(EC.visibilityOf(login.errorMessage));
+     login.errorMessage.getText().then(txt => {
+     expect(txt).toBe('Please enter a valid email address');
+    });
+  });
+
+   it(' display an error message to the user when Correct username/email given',  () => {
+    login.trySignIn('test@gmail.com', '');
+    browser.wait(EC.visibilityOf(login.errorMessage));
+     login.errorMessage.getText().then(txt => {
+      expect(txt).toBe('Please enter your password');
     });
   });
 
 
-  it('should be able to login', async function () {
+   it(' display an error message to the user when password is given',  () => {
+   login.trySignIn('', '123');
+    browser.wait(EC.visibilityOf(login.errorMessage));
+     login.errorMessage.getText().then(txt => {
+      expect(txt).toBe('Please enter your email');
+    });
+  });*/
+
+   it(' display an error message to the user if they provided incorrect credentials', () => {
+    login.trySignIn('123', '123');
+    browser.wait(EC.visibilityOf(login.errorMessage));
+    return login.errorMessage.getText().then(txt => {
+      expect(txt).toBe('Please enter a valid email address');
+    });
+  }); 
+
+
+  it(' be able to login', async function () {
     const username = element(by.css('#logonIdentifier'));
     username.clear();
     await username.sendKeys('dhruv.arora@hays.com');
@@ -62,51 +95,30 @@ describe('cribs.test App', () => {
     await expect(element(by.css('.page')).isPresent()).toBeTruthy();
   })
 
-  it('should redirect the user to the dashboard page if they provided correct credentials..', async function () {
-    browser.wait(() => {
-      browser.controlFlow().execute(function () {
-        browser.ignoreSynchronization = false;
-      });
-    }, 5000);
+  it('redirect the user to the dashboard page if they provided correct credentials..', async function () {
+    browser.waitForAngularEnabled(true);
     await browser.wait(EC.visibilityOf(element(by.css('.page'))));
     await expect(dashboard.dashboardPageExist.isPresent()).toBeTruthy();
   });
-
-
-
-
-
 
   /*
   browser.controlFlow().execute(function() {
       browser.ignoreSynchronization = true;
     });
-  it('should display a list of header menu', () => {
-    page.navigateTo();
+    */
+  it(' display a list of header menu', () => {
     expect(page.getAppHederMenuElements()).toBeTruthy();
   });
 
-  it('should display a list of footer menu', () => {
-    page.navigateTo();
-    expect(page.getAppHederMenuElements()).toBeTruthy();
-  });
 
-  it('should display total  of header menu', () => {
-    page.navigateTo();
-    expect(page.getAllAppHederMenuElements()).toBe(21);
-  });
-
-  it('should display a list of footer menu', () => {
-    page.navigateTo();
+  it(' display a list of footer menu', () => {
     expect(page.getAppFooterMenuElements()).toBeTruthy();
   });
 
-  it('should check all header menu', () => {
-    page.navigateTo();
-    expect(page.getAllMenuElements()).toBeTruthy();
+  it(' check all header menu', async () => {
+    expect(await page.getAllMenuElements()).toBeTruthy();
   });
 
-*/
 
 
 });

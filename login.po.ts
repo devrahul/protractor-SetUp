@@ -1,6 +1,8 @@
-import {browser, element, by} from 'protractor';
+import {browser, element, by, protractor} from 'protractor';
 
 export class LoginPage {
+  public EC = protractor.ExpectedConditions;
+
   get usernameLabel() {
     return element(by.css('.login-field:nth-child(1) label'));
   }
@@ -18,16 +20,23 @@ export class LoginPage {
   }
 
   get errorMessage() {
-    return element(by.className('error itemLevel'));
+    return element(by.css('.highlightError'));
   }
 
   get signIn() {
     return element(by.id('next'));
   }
 
-  trySignIn(username: string, password: string) {
-    this.username.sendKeys(username);
-    this.password.sendKeys(password);
+  shouldHaveForgetPasswordLink() {
+
+  }
+
+  async trySignIn(username?: string, password?: string) {
+    this.username.clear();
+    await this.username.sendKeys(username);
+    this.password.clear();
+    await this.password.sendKeys(password);
     this.signIn.click();
+
   }
 }
